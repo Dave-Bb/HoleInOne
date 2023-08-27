@@ -44,8 +44,8 @@ namespace Assets.Scripts
         {
             isDragging = true;
             dragStartPos = Camera.main.ScreenToWorldPoint(startPos);
-            lineRenderer.SetPosition(0, dragStartPos); // Line starts from initial click
-            lineRenderer.SetPosition(1, dragStartPos);
+            lineRenderer.SetPosition(0, new Vector3(dragStartPos.x, dragStartPos.y, -0.1f)); // Line starts from initial click
+            lineRenderer.SetPosition(1, new Vector3(dragStartPos.x, dragStartPos.y, -0.1f));
             ShowLine();
             
             DragStarted?.Invoke();
@@ -61,7 +61,7 @@ namespace Assets.Scripts
                 dragEndPos = dragStartPos + (dragEndPos - dragStartPos).normalized * maxDragDistance;
             }
         
-            lineRenderer.SetPosition(1, dragEndPos);
+            lineRenderer.SetPosition(1, new Vector3(dragEndPos.x, dragEndPos.y, -0.1f));
         }
         
         private Vector2 GetCurrentInputPosition()

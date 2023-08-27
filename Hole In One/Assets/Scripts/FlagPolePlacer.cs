@@ -1,17 +1,31 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace Assets.Scripts
 {
     public class FlagPolePlacer : MonoBehaviour
     {
-        [SerializeField] private float offset;
-        public void SetPositon(Vector2 flatPos)
+        [SerializeField] private EdgeCollider2D edgeCollider;
+
+        public void UpdatePositionAndColliders((List<Vector2>, Vector2) details)
+        {
+            SetColliderPoints(details.Item1);
+            SetPosition(details.Item2);
+        }
+        
+        private void SetPosition(Vector2 flatPos)
         {
             transform.position = flatPos;
-            var pos = transform.position;
-            pos.y += offset;
-            transform.position = pos;
+        }
 
+        private void SetColliderPoints(List<Vector2> points)
+        {
+            if (edgeCollider == null)
+            {
+                return;
+            }
+
+            edgeCollider.SetPoints(points);
         }
     }
 }

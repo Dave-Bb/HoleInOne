@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -9,6 +10,8 @@ public class CameraMove : MonoBehaviour
     [SerializeField] private float autoScrollSpeed;
 
     private const float Buffer = 0.1f;
+
+    public Action CameraMovementEnded;
 
     private void Awake()
     {
@@ -31,6 +34,29 @@ public class CameraMove : MonoBehaviour
         }
     }
 
+    private bool isScroling;
+
+    public void HoleInOne()
+    {
+        if (isScroling)
+        {
+            return;
+        }
+        
+        StartCoroutine(WaitAndAdvance());
+    }
+    
+    private IEnumerator WaitAndAdvance()
+    {
+        isScroling = true;
+        yield return new WaitForSeconds(1.0f); // Wait for 1 second
+
+        AdvanceToNextHole();
+        isScroling = false;
+    }
+
+    public float holeLenth = 50;
+    
     public void AdvanceToNextHole()
     {
         if (meshGen == null)
@@ -40,7 +66,8 @@ public class CameraMove : MonoBehaviour
         }
 
         var targetPosition = transform.position;
-        targetPosition.x += (meshGen.SegmentLength * (meshGen.VisibleMeshes * 0.5f));
+        //targetPosition.x += (meshGen.SegmentLength * (meshGen.VisibleMeshes * 0.5f));
+        targetPosition.x += holeLenth;
 
         StartCoroutine(SmoothMove(transform.position, targetPosition, lerpDuration));
     }
@@ -57,6 +84,7 @@ public class CameraMove : MonoBehaviour
         }
 
         transform.position = end; // Ensure the final position is set exactly to the end position.
+        CameraMovementEnded?.Invoke();
     }
 
 }

@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/The Knights of Unity Blog/Mesh Gen/Mesh Gen Scene.unity
+    guid: 2367ec1c6164145dd9a096d4df565523
   m_configObjects: {}

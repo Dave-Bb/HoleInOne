@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Assets.Scripts
 {
@@ -16,6 +17,12 @@ namespace Assets.Scripts
         private float freeShotTime = 0.25f;
         private float timeSinceShot;
         private bool blockStop;
+
+        public Action HoleInOne;
+
+        private bool holdTime;
+        private float sinkTime = 0.5f;
+        private float timeInHole;
         
         private void Awake()
         {
@@ -33,11 +40,26 @@ namespace Assets.Scripts
             {
                 timeSinceShot += Time.deltaTime;
             }
+
+            /*if (holdTime)
+            {
+                if (timeInHole >= sinkTime)
+                {
+                    HoleInOne?.Invoke();
+                    holdTime = false;
+                    holeInOne = true;
+                }
+                else
+                {
+                    timeInHole += Time.deltaTime;
+                }
+            }*/
         }
         
         
         public void SetTOffPosition(Vector3 startingPosition)
         {
+            Debug.Log("Set ball starting position to "+startingPosition);
             transform.position = startingPosition;
             initialPosition = rb.position;
             
@@ -52,18 +74,39 @@ namespace Assets.Scripts
             timeSinceShot = 0.0f;
         }
 
+        private bool holeInOne;
+
         private void OnCollisionEnter2D(Collision2D collision)
         {
             if (collision.gameObject.layer == LayerMask.NameToLayer("Ground"))
             {
                 Debug.Log("Ball has hit the ground!");
-                if (!blockStop)
+                if (!blockStop && !holeInOne)
                 {
                     FreezeBall();
                 }
             }
+            
+            
         }
-
+        
+        private void OnTriggerEnter2D(Collider2D collision)
+        {
+            if (holeInOne)
+            {
+                return;
+            }
+            
+            if (collision.gameObject.layer == LayerMask.NameToLayer("Hole"))
+            {
+                Debug.Log("Ball has hit the Hole!!");
+                timeInHole = 0.0f;
+                holdTime = true;
+                holeInOne = true;
+                HoleInOne?.Invoke();
+            }
+        }
+        
         private void FreezeBall()
         {
             rb.velocity = Vector2.zero;
@@ -73,6 +116,7 @@ namespace Assets.Scripts
         
         private void ResetBallPosition()
         {
+            holeInOne = false;
             FreezeBall();
             rb.position = initialPosition;
         }
