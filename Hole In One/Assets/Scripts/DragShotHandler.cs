@@ -5,8 +5,7 @@ namespace Assets.Scripts
 {
     public class DragShotHandler : MonoBehaviour
     {
-        [SerializeField]
-        private float maxDragDistance = 5f; // Max drag distance
+        [SerializeField] private float maxDragDistance = 5f; // Max drag distance
         
         private LineRenderer lineRenderer;
         private bool isDragging = false;

@@ -3,13 +3,8 @@
 public class BallOutOfBoundsMarker : MonoBehaviour
 {
     [SerializeField] private RectTransform marker;
-
     [SerializeField] private GameObject ball;
-
-    [SerializeField] private float offsetFromTop = 100f;
     
-    
-
     private void Awake()
     {
         HideMarker();
@@ -28,7 +23,6 @@ public class BallOutOfBoundsMarker : MonoBehaviour
                 UpdateMarkerPosition();
             }
         }
-       
     }
 
     private void UpdateMarkerPosition()

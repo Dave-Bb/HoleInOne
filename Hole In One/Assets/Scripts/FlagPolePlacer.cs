@@ -6,6 +6,7 @@ namespace Assets.Scripts
     public class FlagPolePlacer : MonoBehaviour
     {
         [SerializeField] private EdgeCollider2D edgeCollider;
+        public EdgeCollider2D EdgeCollider => edgeCollider;
 
         public void UpdatePositionAndColliders((List<Vector2>, Vector2) details)
         {

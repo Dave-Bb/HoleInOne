@@ -311,7 +311,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 350717452}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 25, z: -10}
+  m_LocalPosition: {x: 0, y: 30, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -334,7 +334,6 @@ MonoBehaviour:
   lerpDuration: 2
   AutoScroll: 0
   autoScrollSpeed: 30
-  holeLenth: 50
 --- !u!1 &388084042
 GameObject:
   m_ObjectHideFlags: 0
@@ -643,7 +642,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1732915658390493766, guid: 4fb777080bde5a94d940212761517fef, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1732915658390493766, guid: 4fb777080bde5a94d940212761517fef, type: 3}
       propertyPath: m_LocalPosition.z
@@ -734,10 +733,10 @@ MonoBehaviour:
   flagPolePlacer: {fileID: 845115099}
   cameraMove: {fileID: 350717458}
   scoreText: {fileID: 2031050604}
-  colorManager: {fileID: 0}
   collorController: {fileID: 1799881658}
   targetTOffPosRatio: 0.075
-  targetHolePositionRatio: 0.75
+  holeOneDistance: 30
+  holeDistance: 100
 --- !u!4 &958933741
 Transform:
   m_ObjectHideFlags: 0
@@ -981,7 +980,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   marker: {fileID: 1602903805}
   ball: {fileID: 1730711844}
-  offsetFromTop: 100
 --- !u!4 &1513418323
 Transform:
   m_ObjectHideFlags: 0
@@ -1283,18 +1281,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ScalingFactor: 1
   SegmentLength: 128
-  height: 0
   SegmentResolution: 128
   MeshCount: 6
   VisibleMeshes: 4
   baseHeight: 5
   SegmentPrefab: {fileID: 3314814, guid: 18d3331bb403f45a084af6c602fdcb1f, type: 3}
   groundMaterial: {fileID: 2100000, guid: b458b04b8d36dd742a8ad669896bdcfe, type: 2}
-  flagIndex: 45
+  holeWidth: 8
+  holeDepth: 6
   amplitude: 30
   frequency1: 0.075
   frequency2: 0.1
-  holeDepth: 0.5
   marker: {fileID: 1547045105}
 --- !u!4 &1666700055
 Transform:

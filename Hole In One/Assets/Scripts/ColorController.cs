@@ -1,18 +1,20 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets.Scripts.Controllers
 {
     public class ColorController : MonoBehaviour
     {
-        public Color startColor = Color.green; // Starting color
+        [SerializeField] private Color startColor = Color.green; // Starting color
+        
+        [SerializeField] private float hueChangeSpeed = 0.05f; // Controls how quickly we move to the next hue
+        
         private Color currentColor;
         private Color targetColor;
         private float hue, saturation, value;
-        public float hueChangeSpeed = 0.05f; // Controls how quickly we move to the next hue
-
+        
         public Color CurrentColor => currentColor;
+        
         void Awake()
         {
             Color.RGBToHSV(startColor, out hue, out saturation, out value);

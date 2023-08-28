@@ -4,13 +4,15 @@ using UnityEngine;
 
 public class CameraMove : MonoBehaviour
 {
+    private const float Buffer = 0.1f;
+    
     [SerializeField] private MeshGen meshGen;
     [SerializeField] private float lerpDuration = 1f;
     [SerializeField] private bool AutoScroll;
     [SerializeField] private float autoScrollSpeed;
-
-    private const float Buffer = 0.1f;
-
+    
+    private bool isScroling;
+    
     public Action CameraMovementEnded;
 
     private void Awake()
@@ -21,43 +23,36 @@ public class CameraMove : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (!AutoScroll)
         {
-            AdvanceToNextHole();
+            return;
         }
-
-        if (AutoScroll)
-        {
-            var pos = transform.position;
-            pos.x += autoScrollSpeed * Time.deltaTime;
-            transform.position = pos;
-        }
+        
+        var pos = transform.position;
+        pos.x += autoScrollSpeed * Time.deltaTime;
+        transform.position = pos;
     }
 
-    private bool isScroling;
-
-    public void HoleInOne()
+    public void HoleInOne(float holeDistance)
     {
         if (isScroling)
         {
             return;
         }
         
-        StartCoroutine(WaitAndAdvance());
+        StartCoroutine(WaitAndAdvance(holeDistance));
     }
     
-    private IEnumerator WaitAndAdvance()
+    private IEnumerator WaitAndAdvance(float holeDistance)
     {
         isScroling = true;
         yield return new WaitForSeconds(1.0f); // Wait for 1 second
 
-        AdvanceToNextHole();
+        AdvanceToNextHole(holeDistance);
         isScroling = false;
     }
-
-    public float holeLenth = 50;
     
-    public void AdvanceToNextHole()
+    private void AdvanceToNextHole(float holeDistance)
     {
         if (meshGen == null)
         {
@@ -67,7 +62,7 @@ public class CameraMove : MonoBehaviour
 
         var targetPosition = transform.position;
         //targetPosition.x += (meshGen.SegmentLength * (meshGen.VisibleMeshes * 0.5f));
-        targetPosition.x += holeLenth;
+        targetPosition.x += holeDistance;
 
         StartCoroutine(SmoothMove(transform.position, targetPosition, lerpDuration));
     }
@@ -86,5 +81,4 @@ public class CameraMove : MonoBehaviour
         transform.position = end; // Ensure the final position is set exactly to the end position.
         CameraMovementEnded?.Invoke();
     }
-
 }
