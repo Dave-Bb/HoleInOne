@@ -3,9 +3,10 @@ using UnityEngine;
 
 namespace Assets.Scripts
 {
-    public class DragShotHandler : MonoBehaviour
+    public class DragShotHandler : MonoBehaviour, IAdvancer
     {
         [SerializeField] private float maxDragDistance = 5f; // Max drag distance
+        [SerializeField] private GameController gameController;
         
         private LineRenderer lineRenderer;
         private bool isDragging = false;
@@ -24,6 +25,11 @@ namespace Assets.Scripts
         
         private void Update()
         {
+            if (gameController.IsPaused)
+            {
+                return;
+            }
+            
             // Detect input (whether mouse or touch)
             if (Input.GetMouseButtonDown(0))
             {
@@ -32,11 +38,13 @@ namespace Assets.Scripts
             if (isDragging)
             {
                 UpdateDrag(GetCurrentInputPosition());
+                
+                if (Input.GetMouseButtonUp(0))
+                {
+                    EndDrag();
+                }
             }
-            if (Input.GetMouseButtonUp(0))
-            {
-                EndDrag();
-            }
+            
         }
         
         private void StartDrag(Vector2 startPos)
@@ -102,6 +110,16 @@ namespace Assets.Scripts
         private void HideLine()
         {
             lineRenderer.enabled = false;
+        }
+
+        public void OnAdvance(float advanceValue)
+        {
+            maxDragDistance = advanceValue;
+        }
+
+        public float CurrentAdvanceValue()
+        {
+            return maxDragDistance;
         }
     }
 }

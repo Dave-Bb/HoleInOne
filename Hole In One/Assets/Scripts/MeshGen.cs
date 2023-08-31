@@ -4,6 +4,8 @@ using System;
 
 public class MeshGen : MonoBehaviour
 {
+    public Transform ground;
+    
     public float ScalingFactor = 1f;
 
     // the length of segment (world space)
@@ -146,6 +148,10 @@ public class MeshGen : MonoBehaviour
                 EnsureSegmentVisible(i);
             }
         }
+
+        var currentGroundPos = ground.transform.localPosition;
+        currentGroundPos.x = Camera.main.transform.position.x * 0.5f;
+        ground.transform.localPosition = currentGroundPos;
     }
 
     public void FireInitialGenFinished(Action onComplete)

@@ -1,8 +1,9 @@
 using System;
 using System.Collections;
+using Assets.Scripts;
 using UnityEngine;
 
-public class CameraMove : MonoBehaviour
+public class CameraMove : MonoBehaviour, IAdvancer
 {
     private const float Buffer = 0.1f;
     
@@ -15,8 +16,12 @@ public class CameraMove : MonoBehaviour
     
     public Action CameraMovementEnded;
 
+    private Camera camera;
+
     private void Awake()
     {
+        camera = GetComponent<Camera>();
+        
         var currentCameraPos = transform.position;
         currentCameraPos.x += Buffer;
     }
@@ -33,14 +38,21 @@ public class CameraMove : MonoBehaviour
         transform.position = pos;
     }
 
-    public void HoleInOne(float holeDistance)
+    public void HoleInOne(float holeDistance, bool Imedeate = false)
     {
         if (isScroling)
         {
             return;
         }
+
+        if (!Imedeate)
+        {
+            StartCoroutine(WaitAndAdvance(holeDistance));
+            return;
+        }
         
-        StartCoroutine(WaitAndAdvance(holeDistance));
+        AdvanceToNextHole(holeDistance);
+        isScroling = false;
     }
     
     private IEnumerator WaitAndAdvance(float holeDistance)
@@ -80,5 +92,15 @@ public class CameraMove : MonoBehaviour
 
         transform.position = end; // Ensure the final position is set exactly to the end position.
         CameraMovementEnded?.Invoke();
+    }
+
+    public void OnAdvance(float advanceValueOne)
+    {
+        camera.orthographicSize = advanceValueOne;
+    }
+
+    public float CurrentAdvanceValue()
+    {
+        return camera.orthographicSize;
     }
 }

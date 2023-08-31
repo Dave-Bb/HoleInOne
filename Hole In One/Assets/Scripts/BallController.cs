@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using UnityEngine;
 
 namespace Assets.Scripts
@@ -6,6 +7,9 @@ namespace Assets.Scripts
     public class BallController : MonoBehaviour
     {
         [SerializeField] private float hitForceMultiplier;
+        [SerializeField] private TrailRenderer trailRednerer;
+        [SerializeField] private float trailRendererStartingLifeTime = 0.35f;
+        [SerializeField] private float trailShutdownTime = 0.25f;
         
         private Rigidbody2D rb;
         private Vector2 initialPosition;
@@ -36,7 +40,11 @@ namespace Assets.Scripts
         }
 
         public void SetTOffPosition(Vector3 startingPosition)
-        {
+        {            
+            
+            trailRednerer.enabled = false;
+
+        
             transform.position = startingPosition;
             initialPosition = rb.position;
             
@@ -45,10 +53,18 @@ namespace Assets.Scripts
 
         public void Shoot(Vector2 force)
         {
+            ResetTrailRenderer();
+            
             rb.isKinematic = false;
             rb.AddForce(-force * hitForceMultiplier, ForceMode2D.Impulse);
             blockStop = true;
             timeSinceShot = 0.0f;
+        }
+
+        private void ResetTrailRenderer()
+        {
+            trailRednerer.enabled = true;
+            trailRednerer.time = trailRendererStartingLifeTime;
         }
 
 
@@ -77,11 +93,30 @@ namespace Assets.Scripts
             }
         }
         
+        // Coroutine to lerp the float value to zero over the given time
+        IEnumerator LerpRendererTimeToZero()
+        {
+            float startTime = Time.time;
+            float startValue = trailRednerer.time;
+
+            while (Time.time - startTime < trailShutdownTime)
+            {
+                // Calculate how far along the duration we are as a percentage
+                float t = (Time.time - startTime) / trailShutdownTime;
+
+                // Lerp the value towards 0
+                trailRednerer.time = Mathf.Lerp(startValue, 0.0f, t);
+                // Yield execution to the next frame
+                yield return null;
+            }
+        }
+        
         private void FreezeBall()
         {
             rb.velocity = Vector2.zero;
             rb.angularVelocity = 0f;
             rb.isKinematic = true;
+            StartCoroutine(LerpRendererTimeToZero());
         }
         
         private void ResetBallPosition()

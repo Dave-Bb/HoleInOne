@@ -1,10 +1,11 @@
-﻿using Assets.Scripts.Controllers;
+﻿using System;
+using Assets.Scripts.Controllers;
 using TMPro;
 using UnityEngine;
 
 namespace Assets.Scripts
 {
-    public class GameController : MonoBehaviour
+    public class GameController : MonoBehaviour, IAdvancer
     {
         private const string ScorePref = "Score";
         
@@ -17,11 +18,16 @@ namespace Assets.Scripts
         [SerializeField] private ColorController collorController;
         
         [SerializeField] private float  targetTOffPosRatio = 0.075f;
-        [SerializeField] private float holeOneDistance = 30f;
+       // [SerializeField] private float holeOneDistance = 30f;
         [SerializeField] private float holeDistance = 100f;
+
+        public Action<float, bool> HoleInOne;
         
-        private int currentStcore = 0;
+        public int CurrentScore { get; private set; }
+        public bool IsPaused { get; private set; }
+        
         private int holeNumber;
+        
 
         private void Awake()
         {
@@ -30,11 +36,13 @@ namespace Assets.Scripts
             cameraMove.CameraMovementEnded += OnCameraMoveEnded;
             ballController.HoleInOne += OnHoleInOne;
 
-            currentStcore = PlayerPrefs.GetInt(ScorePref, currentStcore);
-            scoreText.text = currentStcore.ToString();
+           // CurrentScore = PlayerPrefs.GetInt(ScorePref, CurrentScore);
+            scoreText.text = CurrentScore.ToString();
             
             meshGen.SetHolePosition(GetHoleDistance());
             meshGen.SetHoleEdgeCollider(flagPolePlacer.EdgeCollider, GetHoleDistance());
+            
+            HoleInOne?.Invoke(0, true);
         }
         
         private void Start()
@@ -58,9 +66,17 @@ namespace Assets.Scripts
             }
         }
 
+        public void SetPause(bool paused)
+        {
+            IsPaused = paused;
+        }
+
         private float GetHoleDistance()
         {
-            return holeOneDistance + (holeDistance * holeNumber);
+            var holePos = cameraMove.transform.position.x;
+            holePos += holeDistance;
+            return holePos;
+           // return holeOneDistance + (holeDistance * holeNumber);
         }
 
         private void UpdateColors()
@@ -73,19 +89,37 @@ namespace Assets.Scripts
             meshGen.UpdateColor(collorController.CurrentColor);
         }
 
-        private void OnHoleInOne()
+        public void OnHoleInOne()
         {
             holeNumber += 1;
-            cameraMove.HoleInOne(holeDistance);
+            cameraMove.HoleInOne(holeDistance * 3f);
 
-            currentStcore += 1;
-            PlayerPrefs.SetInt(ScorePref, currentStcore);
+            CurrentScore += 1;
+            PlayerPrefs.SetInt(ScorePref, CurrentScore);
             PlayerPrefs.Save();
             
-            scoreText.text = currentStcore.ToString();
+            scoreText.text = CurrentScore.ToString();
             collorController.SetNextColor();
+            
+            HoleInOne?.Invoke(CurrentScore, false);
+        }
+        
+        public void SkipHole()
+        {
+            holeNumber += 1;
+            cameraMove.HoleInOne(holeDistance * 3f, true);
+
+            CurrentScore += 1;
+            PlayerPrefs.SetInt(ScorePref, CurrentScore);
+            PlayerPrefs.Save();
+            
+            scoreText.text = CurrentScore.ToString();
+            collorController.SetNextColor();
+            
+            HoleInOne?.Invoke(CurrentScore, true);
         }
 
+        public float testHoleDistance;
         private void OnCameraMoveEnded()
         {
             meshGen.SetHolePosition(GetHoleDistance());
@@ -114,6 +148,16 @@ namespace Assets.Scripts
             var rayPos = meshGen.CheckForPosition(targetTOffPosRatio);
             rayPos.y += +0.01f;
             return rayPos;
+        }
+
+        public void OnAdvance(float advanceValueOne)
+        {
+            holeDistance = advanceValueOne;
+        }
+
+        public float CurrentAdvanceValue()
+        {
+            return holeDistance;
         }
     }
 }

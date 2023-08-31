@@ -15,6 +15,7 @@ namespace Assets.Scripts.Controllers
         
         public Color CurrentColor => currentColor;
         
+        
         void Awake()
         {
             Color.RGBToHSV(startColor, out hue, out saturation, out value);

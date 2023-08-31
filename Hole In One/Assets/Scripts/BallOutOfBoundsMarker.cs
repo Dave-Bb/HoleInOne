@@ -14,7 +14,8 @@ public class BallOutOfBoundsMarker : MonoBehaviour
     {
         if (Camera.current != null)
         {
-            if (Camera.current.WorldToScreenPoint(ball.transform.position).y < Screen.height)
+            var cameraScreenPos = Camera.current.WorldToScreenPoint(ball.transform.position);
+            if (cameraScreenPos.y < Screen.height && cameraScreenPos.x < Screen.width)
             {
                 HideMarker();
             }
@@ -36,15 +37,66 @@ public class BallOutOfBoundsMarker : MonoBehaviour
         Vector2 viewportPos = Camera.current.WorldToViewportPoint(ball.transform.position);
 
         // Determine on which edge of the screen to place the tracking object.
-        if (viewportPos.x < 0f) viewportPos.x = 0f;
-        if (viewportPos.x > 1f) viewportPos.x = 1f;
-        if (viewportPos.y < 0f) viewportPos.y = 0f;
-        if (viewportPos.y > 1f) viewportPos.y = 1f;
+        bool onXEdge = false;
+        bool onYEdge = false;
+
+        if (viewportPos.x < 0f)
+        {
+            viewportPos.x = 0f;
+            onXEdge = true;
+        }
+        if (viewportPos.x > 1f)
+        {
+            viewportPos.x = 1f;
+            onXEdge = true;
+        }
+        if (viewportPos.y < 0f)
+        {
+            viewportPos.y = 0f;
+            onYEdge = true;
+        }
+        if (viewportPos.y > 1f)
+        {
+            viewportPos.y = 1f;
+            onYEdge = true;
+        }
 
         // Convert the viewport position to a position on the screen/canvas.
         Vector2 screenPos = new Vector2(viewportPos.x * Camera.current.pixelWidth, viewportPos.y * Camera.current.pixelHeight);
-        screenPos.y = Camera.current.pixelHeight - 50f;
-        marker.SetPositionAndRotation(screenPos, Quaternion.identity);
+
+        // Adjust position to the edges if required.
+        if (viewportPos.x >= 1f)
+        {
+            screenPos.x = Camera.current.pixelWidth - 50f;
+        }
+        if (viewportPos.y >= 1f)
+        {
+            screenPos.y = Camera.current.pixelHeight - 50f;
+        }
+
+        // Update marker position.
+        marker.position = screenPos;
+
+        // Determine marker rotation based on which edge it's on
+        if (onXEdge && !onYEdge)
+        {
+            // Marker should rotate 90 degrees to the right when tracking along the Y-axis.
+            marker.rotation = Quaternion.AngleAxis(-90, Vector3.forward);
+        }
+        else if (!onXEdge && onYEdge)
+        {
+            // Marker should point "up" when tracking along the X-axis.
+            marker.SetPositionAndRotation(screenPos, Quaternion.identity);
+            
+        }
+        else
+        {
+            // For other cases (corners or on-screen), make the marker face the ball.
+            Vector2 directionToBall = ball.transform.position - marker.position;
+            float angle = Mathf.Atan2(directionToBall.y, directionToBall.x) * Mathf.Rad2Deg;
+            marker.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+        }
+    
     }
 
     private void HideMarker()
